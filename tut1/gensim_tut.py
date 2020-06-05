@@ -1,23 +1,24 @@
-import gensim
+"""
+This module includes basic utilities to train a word2vec model using gensim
+"""
+import os
+import sys
+from py_tut import read_dataset
 from gensim.models import Word2Vec
 
 
-def main():
+def main(data_path):
     """
     Train a word2vec model on the given dataset
     """
-    with open('data/raw/pos.txt') as f:
-        pos_lines = f.readlines()
-    with open('data/raw/neg.txt') as f:
-        neg_lines = f.readlines()
-
-    all_lines = pos_lines + neg_lines
+    all_lines = read_dataset(data_path)
     print('Splitting lines in the dataset')
     all_lines = [line.strip().split() for line in all_lines]
     print('Training word2vec model')
+    # This will take some to finish
     w2v = Word2Vec(all_lines, size=100, window=5, min_count=1, workers=4)
     w2v.save('data/processed/w2v.model')
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1])

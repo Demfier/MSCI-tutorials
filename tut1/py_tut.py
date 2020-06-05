@@ -1,3 +1,9 @@
+"""
+This module is a template containing basic utilities to read raw dataset
+and generate appropriately processed files.
+"""
+
+
 import os
 import sys
 import json
@@ -6,20 +12,29 @@ from tqdm import tqdm
 from pprint import pprint
 
 
-def main(data_path):
+def read_dataset(data_path):
     """
-    reads the raw dataset from data_path, creates a vocab dictionary,
-    "tokenizes" the sentences in the dataset
+    reads the raw dataset and returns all the lines as a list of string
     """
-
     # os.path can be used for seamless path construction across different
     # operating systems.
     with open(os.path.join(data_path, 'pos.txt')) as f:
         pos_lines = f.readlines()
     with open(os.path.join(data_path, 'neg.txt')) as f:
         neg_lines = f.readlines()
-
     all_lines = pos_lines + neg_lines
+    return all_lines
+
+
+def main(data_path):
+    """
+    reads the raw dataset from data_path, creates a vocab dictionary,
+    "tokenizes" the sentences in the dataset.
+    NOTE: In our case tokenization simply refers to splitting a sentence at ' '
+    """
+
+    # Read raw data
+    all_lines = read_dataset(data_path)
     total_lines = len(all_lines)
 
     vocab = {}
@@ -35,9 +50,11 @@ def main(data_path):
 
     for idx, line in tqdm(enumerate(all_lines)):
         line = line.strip().split()
+        # construct the entry to be added to the csv files
         csv_line = '{}\n'.format(','.join(line))
         csv_data += csv_line
 
+        # decide whether to add the entry to train/val/test set based on idx
         if idx < train_size:
             train_data += csv_line
         elif idx >= train_size and idx < train_size + val_size:
@@ -45,12 +62,14 @@ def main(data_path):
         else:
             test_data += csv_line
 
+        # constuct vocab dictionary
         for word in line:
             word = word.lower()
             if word not in vocab:
                 vocab[word] = 0
             vocab[word] += 1
 
+    # save processed files
     with open('data/processed/tokenized.csv', 'w') as f:
         f.write(csv_data)
     with open('data/processed/train.csv', 'w') as f:
@@ -64,4 +83,5 @@ def main(data_path):
 
 
 if __name__ == '__main__':
+    # use a command-line argument to input raw data path
     main(sys.argv[1])
