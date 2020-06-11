@@ -1,13 +1,14 @@
 import os
 import sys
+from pprint import pprint
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 
-def read_csv(csv_path):
-    with open(csv_path) as f:
+def read_csv(data_path):
+    with open(data_path) as f:
         data = f.readlines()
     return [' '.join(line.strip().split(',')) for line in data]
 
@@ -25,29 +26,48 @@ def load_data(data_dir):
 
 
 def train(x_train, y_train):
-    print('CountVectorizer')
+    print('Calling CountVectorizer')
     count_vect = CountVectorizer()
-    x_train_counts = count_vect.fit_transform(x_train)
-    print('TfIdf')
+    x_train_count = count_vect.fit_transform(x_train)
+    print('Building Tf-idf vectors')
     tfidf_transformer = TfidfTransformer()
-    x_train_tfidf = tfidf_transformer.fit_transform(x_train_counts)
-    print('MNB')
+    x_train_tfidf = tfidf_transformer.fit_transform(x_train_count)
+    print('Training MNB')
     clf = MultinomialNB().fit(x_train_tfidf, y_train)
     return clf, count_vect, tfidf_transformer
 
 
+def evaluate(x, y, clf, count_vect, tfidf_transformer):
+    x_count = count_vect.transform(x)
+    x_tfidf = tfidf_transformer.transform(x_count)
+    preds = clf.predict(x_tfidf)
+    return {
+        'accuracy': accuracy_score(y, preds),
+        'precision': precision_score(y, preds),
+        'recall': recall_score(y, preds),
+        'f1': f1_score(y, preds),
+        }
+
+
 def main(data_dir):
+    """
+    loads the dataset along with labels, trains a simple MNB classifier
+    and returns validation and test scores in a dictionary
+    """
+    # load data
     x_train, x_val, x_test, y_train, y_val, y_test = load_data(data_dir)
     # train
     clf, count_vect, tfidf_transformer = train(x_train, y_train)
-    # validate
-    x_val_counts = count_vect.transform(x_val)
-    x_val_tfidf = tfidf_transformer.transform(x_val_counts)
-    predicted = clf.predict(x_val_tfidf)
 
-    prfa = precision_recall_fscore_support(y_val, predicted, average='macro')
-    print(prfa)
+    scores = {}
+    # validate
+    print('Validating')
+    scores['val'] = evaluate(x_val, y_val, clf, count_vect, tfidf_transformer)
+    # test
+    print('Testing')
+    scores['test'] = evaluate(x_test, y_test, clf, count_vect, tfidf_transformer)
+    return scores
 
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    pprint(main(sys.argv[1]))
