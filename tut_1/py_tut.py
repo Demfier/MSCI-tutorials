@@ -23,7 +23,7 @@ def read_dataset(data_path):
     with open(os.path.join(data_path, 'neg.txt')) as f:
         neg_lines = f.readlines()
     all_lines = pos_lines + neg_lines
-    return all_lines
+    return list(zip(all_lines, [1]*len(pos_lines) + [0]*len(neg_lines)))
 
 
 def main(data_path):
@@ -42,6 +42,7 @@ def main(data_path):
     train_data = ''
     val_data = ''
     test_data = ''
+    labels_data = ''
 
     train_size = int(0.8*total_lines)
     val_size = int(0.1*total_lines)
@@ -49,10 +50,12 @@ def main(data_path):
     random.shuffle(all_lines)
 
     for idx, line in tqdm(enumerate(all_lines)):
-        line = line.strip().split()
+        sentence = line[0].strip().split()
+        label = line[1]
         # construct the entry to be added to the csv files
-        csv_line = '{}\n'.format(','.join(line))
+        csv_line = '{}\n'.format(','.join(sentence))
         csv_data += csv_line
+        labels_data += '{}\n'.format(label)
 
         # decide whether to add the entry to train/val/test set based on idx
         if idx < train_size:
@@ -63,7 +66,7 @@ def main(data_path):
             test_data += csv_line
 
         # constuct vocab dictionary
-        for word in line:
+        for word in sentence:
             word = word.lower()
             if word not in vocab:
                 vocab[word] = 0
@@ -78,6 +81,8 @@ def main(data_path):
         f.write(val_data)
     with open('data/processed/test.csv', 'w') as f:
         f.write(test_data)
+    with open('data/processed/labels.csv', 'w') as f:
+        f.write(labels_data)
     with open('data/processed/vocab.json', 'w') as f:
         json.dump(vocab, f)
 
