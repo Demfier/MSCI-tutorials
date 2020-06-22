@@ -13,7 +13,7 @@ def main(data_path):
     """
     all_lines = read_dataset(data_path)
     print('Splitting lines in the dataset')
-    all_lines = [line.strip().split() for line in all_lines]
+    all_lines = [line[0].strip().split() for line in all_lines]
     print('Training word2vec model')
     # This will take some to finish
     w2v = Word2Vec(all_lines, size=100, window=5, min_count=1, workers=4)

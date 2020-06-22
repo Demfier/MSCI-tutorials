@@ -1,5 +1,6 @@
 import os
 import sys
+import pickle
 from pprint import pprint
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import CountVectorizer
@@ -58,6 +59,15 @@ def main(data_dir):
     x_train, x_val, x_test, y_train, y_val, y_test = load_data(data_dir)
     # train
     clf, count_vect, tfidf_transformer = train(x_train, y_train)
+
+    with open('tut_2/data/mnb_uni.pkl', 'wb') as f:
+        pickle.dump(clf, f)
+
+    with open('tut_2/data/count_vect.pkl', 'wb') as f:
+        pickle.dump(count_vect, f)
+
+    with open('tut_2/data/tfidf_transformer.pkl', 'wb') as f:
+        pickle.dump(tfidf_transformer, f)
 
     scores = {}
     # validate
