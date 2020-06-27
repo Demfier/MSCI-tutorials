@@ -1,3 +1,4 @@
+# contains hyperparameters for our seq2seq model. you can add some more
 config = {
     'batch_size': 200,
     'max_vocab_size': 20000,
