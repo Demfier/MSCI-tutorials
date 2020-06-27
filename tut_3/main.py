@@ -29,7 +29,7 @@ def load_data(data_dir):
                              for line in x_test]
 
 
-def build_embedding_mat(vocab, w2v):
+def build_embedding_mat(data_dir, vocab, w2v):
     """
     Build the embedding matrix which will be used to initialize weights of
     the embedding layer in our seq2seq architecture
@@ -104,7 +104,7 @@ def main(data_dir):
     w2v = Word2Vec.load(os.path.join(data_dir, 'w2v.model'))
     print('Building embedding matrix')
     # This matrix will be used to initialze weights in the embedding layer
-    embedding_matrix, word2token = build_embedding_mat(vocab, w2v)
+    embedding_matrix, word2token = build_embedding_mat(data_dir, vocab, w2v)
     print('embedding_matrix.shape => {}'.format(embedding_matrix.shape))
 
     print('Building Seq2Seq model')
@@ -192,7 +192,10 @@ def main(data_dir):
               epochs=10,  # try increasin #epochs
               validation_split=0.2)
     # Save model
-    model.save(os.path.join(data_dir, 'ae.model'))
+    # this model is saved inside the tut_3/data folder just to showcase how
+    # you can save your models as well inside respective assignment folders
+    # and use them later
+    model.save('tut_3/data/ae.model')
 
 
 if __name__ == '__main__':

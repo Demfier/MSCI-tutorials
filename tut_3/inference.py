@@ -22,7 +22,7 @@ def main(data_dir, model_code):
         token2word = json.load(f)
     # Restore the model and construct the encoder and decoder.
     model = keras.models.load_model(
-        os.path.join(data_dir, '{}.model'.format(model_code)))
+        os.path.join('tut_3/data/{}.model'.format(model_code)))
     print(model.summary())
 
     # reconstruct the decoding layer using the loaded model
@@ -97,7 +97,8 @@ def main(data_dir, model_code):
             states_values = [h, c]
 
         print('Input sentence: {}\nReconstructed sentence: {}\n'.format(
-            x_test[seq_index][len('<sos> '):-len(' <eos>')], decoded_translation))
+            x_test[seq_index].lower()[len('<sos> '):-len(' <eos>')],
+            decoded_translation))
         print('===============')
 
 
