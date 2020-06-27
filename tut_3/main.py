@@ -63,9 +63,9 @@ def build_embedding_mat(vocab, w2v):
             # skip any oov words from the perspective of our trained w2v model
             continue
     # save the two dicts
-    with open('data/processed/token2word.json', 'w') as f:
+    with open(os.path.join(data_dir, 'token2word.json'), 'w') as f:
         json.dump(token2word, f)
-    with open('data/processed/word2token.json', 'w') as f:
+    with open(os.path.join(data_dir, 'word2token.json'), 'w') as f:
         json.dump(word2token, f)
     return embedding_matrix, word2token
 
