@@ -172,7 +172,7 @@ def main(data_dir):
     decoder_input_data = np.ones(
         (len(x_train_val), config['max_seq_len']),
         dtype='float32')
-    decoder_target_data = np.ones(
+    decoder_target_data = np.zeros(
         (len(x_train_val), config['max_seq_len'], len(vocab)+4),
         dtype='float32')
 
